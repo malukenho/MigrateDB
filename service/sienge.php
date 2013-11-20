@@ -21,25 +21,17 @@ class Sienge
 	 */
 	private $output;
 
-	/**
-	 * undocumented function
-	 *
-	 * @return void
-	 * @author 
-	 */
-	public function __callStatic()
-	{
-		return new self();
-	}
-
-	/**
-	 * undocumented function
-	 *
-	 * @return void
-	 * @author 
-	 */
+    /**
+     * undocumented function
+     *
+     * @param inputFacade $inputDB
+     * @return void
+     * @author
+     */
 	public function setInput(inputFacade $inputDB)
 	{
+        $this->input = $inputDB;
+        return $this;
 	}
 
 	/**
@@ -50,6 +42,8 @@ class Sienge
 	 */
 	public function setOutput(outputFacade $outputDB)
 	{
+        $this->output = $outputDB;
+        return $this;
 	}
 
 	/**
@@ -58,8 +52,11 @@ class Sienge
 	 * @return void
 	 * @author 
 	 */
-	public function startTransaction()
+	public function startTransaction(relationMapper $dataMapper)
 	{
-	}
+	
+    }
 
 }
+
+return new Sienge();

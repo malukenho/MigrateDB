@@ -1,3 +1,8 @@
 <?php
-require 'Factoty.php';
-return Factory::getInstance('Service.Sienge');
+/**
+ *
+ *
+ */
+require 'Factory.php';
+
+return new Factory;

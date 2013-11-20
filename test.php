@@ -1,11 +1,46 @@
 <?php
-$a = require 'Load.php';
+require 'Load.php';
+require 'Interface/EnumTablesRelation.php';
+require 'RouterMap.php';
+require 'Mapper/Sienge/mysql.php';
 
-$b = $a->getService('Service.Sienge');
+$config['host']     = 'localhost';
+$config['usuario']  = 'construtor_massa';
+$config['senha']    = 'kidA09Ba@#ade';
+$config['database'] = 'construtor_massai';
 
-$b->setInput(
-	$a->getService('Provide.Mysql')
-)->setOutput(
-	$a->getService('Provide.FireBird')
+$fireBirdConnection = new PDO(
+    'firebird:dbname=177.43.233.34:/home/SiengeWeb/SIENGE.FDB',
+    'sysdba',
+    'masterkey'
 );
 
+$fireBirdConnection->setAttribute(
+    PDO::ATTR_ERRMODE,
+    PDO::ERRMODE_EXCEPTION
+);
+
+// ---- teste ----
+$a = $fireBirdConnection->query(
+	'select FIRST 1 CDCLIENTE from ECADCLIENTE order by CDCLIENTE DESC'
+);
+
+
+$result = $a->fetchAll();
+$newID = ++$result[0][0];
+$uniqueID = $newID;
+// --- --
+$mySqlConnection = new PDO(
+    sprintf('mysql:host=%s;dbname=%s', $config['host'], $config['database']), 
+    $config['usuario'], 
+    $config['senha']
+);
+
+$mySqlConnection->setAttribute(
+    PDO::ATTR_ERRMODE,
+    PDO::ERRMODE_EXCEPTION
+);
+
+$router = new RouterMap(new Clients);
+$router->setConnection($mySqlConnection, $fireBirdConnection)
+	->MapperDatas($uniqueID);
