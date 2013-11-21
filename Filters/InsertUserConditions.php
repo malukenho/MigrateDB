@@ -13,13 +13,17 @@ class InsertUserConditions implements FilterParams
      * @return string
      * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      */
-    public function keekFilterParams($key, $value)
+    public function keekFilterParams($key, $value, $adtional = null)
     {
         if($key == 'CDUSUARIO' || $key == 'CDUSUARIOCAD')
-            return "'TESTES_ALFAMA3'";
-        elseif($key != 'CDCLIENTE')
+            return "'ALFAMA_TEST6'";
+
+        if($key == 'FLTPCLIENTE')
+            return ('cpf' == $value) ? "'F'" : "'J'";
+        
+        if($key != 'CDCLIENTE')
             return "'$value'";
         else
-            return "{$this->id}";
+            return "{$adtional}";
     }
 }

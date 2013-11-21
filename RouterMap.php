@@ -1,14 +1,19 @@
 <?php
 /**
- * This class create a relational map betwen databasses
- * 
+ * undocumented class
+ *
+ * @package default
+ * @author 
  */
 class RouterMap
 {
     /**
-     *  Class to be reflected
+     * Class to be reflected is storage here
+     *
+     * @var object
      */
     private $reflectionClass;
+    
     private $filters;
     private $ofDb;
     private $toDb;
@@ -44,7 +49,7 @@ class RouterMap
     public function MapperDatas($uniqueID)
     {
         $this->id = $uniqueID;
-
+        
         try{
             
             if (! $this->isPropertiesOk()) {
@@ -67,6 +72,7 @@ class RouterMap
             );
 
             $this->toDb->exec($insertDDLs);
+
 
         } catch (Exception $error) {
             echo '<br /><strong>Error:</strong> '. $error->getMessage();
@@ -109,7 +115,7 @@ class RouterMap
 
             foreach ($combined as $key => $value) {
                 $field[] = $key;
-                $datas[] = $this->filters->keekFilterParams($key, $value);
+                $datas[] = $this->filters->keekFilterParams($key, $value, $this->id);
             } 
 
             $query .= '('.implode(', ', $field).')';
@@ -117,7 +123,7 @@ class RouterMap
 
             $query = rtrim($query, ', ') . ';';
         }
-        echo $query;
+        echo $query. '<br />';
         return  $query;
     }
 
