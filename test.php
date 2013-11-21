@@ -1,8 +1,5 @@
 <?php
 require 'Load.php';
-require 'Interface/EnumTablesRelation.php';
-require 'RouterMap.php';
-require 'Mapper/Sienge/mysql.php';
 
 $config['host']     = 'localhost';
 $config['usuario']  = 'construtor_massa';
@@ -30,6 +27,8 @@ $result = $a->fetchAll();
 $newID = ++$result[0][0];
 $uniqueID = $newID;
 // --- --
+
+
 $mySqlConnection = new PDO(
     sprintf('mysql:host=%s;dbname=%s', $config['host'], $config['database']), 
     $config['usuario'], 
@@ -41,6 +40,11 @@ $mySqlConnection->setAttribute(
     PDO::ERRMODE_EXCEPTION
 );
 
+$router = new RouterMap(new Usuario);
+$router->setConnection($mySqlConnection, $fireBirdConnection)
+    ->MapperDatas($uniqueID);
+
 $router = new RouterMap(new Clients);
 $router->setConnection($mySqlConnection, $fireBirdConnection)
 	->MapperDatas($uniqueID);
+
