@@ -11,7 +11,8 @@ class Clients implements EnumTablesRelation
     const data_cad = 'DTCADASTRAMENTO';
     const ativo_login = 'FLTPCLIENTE';
     const idpais = 'CDUSUARIOCAD';
-    //const NUFONECEL = '$people-telefone';
+    //const NUFONECEL = 'telefone';
+    //const FLTPCLIENTE = 'documento_tipo';
     //const CDTIPOCLIENTE = 'null';
     //const DEMSN = 'null';
     //const DESKYPE = 'null';
