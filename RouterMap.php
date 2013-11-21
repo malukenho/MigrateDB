@@ -95,7 +95,9 @@ class RouterMap
 			foreach ($combined as $key => $value) {
 				$field[] = $key;
 
-				if($key != 'CDCLIENTE')
+				if($key == 'CDUSUARIO' || $key == 'CDUSUARIOCAD')
+					$datas[] = "'TESTES_ALFAMA2'";
+				elseif($key != 'CDCLIENTE')
 					$datas[] = "'$value'";
 				else
 					$datas[] = "{$this->id}";

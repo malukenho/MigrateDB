@@ -1,14 +1,7 @@
 <?php
 class Clients implements EnumTablesRelation
 {
-	/**
-	 * Constant names
-	 */
 	const OF_TABLE = 'pessoas';
-
-	/**
-	 * Constant values
-	 */
 	const TO_TABLE = 'ECADCLIENTE';
 
     const idpessoa = 'CDCLIENTE';
@@ -16,8 +9,8 @@ class Clients implements EnumTablesRelation
     const email = 'DEEMAIL';
     const ativo = 'FLATIVO';
     const data_cad = 'DTCADASTRAMENTO';
-    const  ativo_login = 'FLTPCLIENTE';
-    const idestado = 'CDUSUARIOCAD';
+    const ativo_login = 'FLTPCLIENTE';
+    const idpais = 'CDUSUARIOCAD';
     //const NUFONECEL = '$people-telefone';
     //const CDTIPOCLIENTE = 'null';
     //const DEMSN = 'null';
