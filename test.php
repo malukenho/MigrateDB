@@ -19,7 +19,7 @@ $fireBirdConnection->setAttribute(
 
 // ---- teste ----
 $a = $fireBirdConnection->query(
-	'select FIRST 1 CDCLIENTE from ECADCLIENTE order by CDCLIENTE DESC'
+    'select FIRST 1 CDCLIENTE from ECADCLIENTE order by CDCLIENTE DESC'
 );
 
 
@@ -40,9 +40,11 @@ $mySqlConnection->setAttribute(
     PDO::ERRMODE_EXCEPTION
 );
 
-
-
-
+// Cadastrar empreendimento
+$router = new RouterMap(new Empreendimentos);
+$router->setConnection($mySqlConnection, $fireBirdConnection)
+    ->registerFilter(new InsertUserConditions)
+    ->MapperDatas($uniqueID);
 
 
 // Insert Client
@@ -53,4 +55,5 @@ $router->setConnection($mySqlConnection, $fireBirdConnection)
 
 $router = new RouterMap(new Clients);
 $router->setConnection($mySqlConnection, $fireBirdConnection)
-	->MapperDatas($uniqueID);
+    ->registerFilter(new InsertUserConditions)
+    ->MapperDatas($uniqueID);

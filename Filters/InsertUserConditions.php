@@ -20,6 +20,9 @@ class InsertUserConditions implements FilterParams
 
         if($key == 'FLTPCLIENTE')
             return ('cpf' == $value) ? "'F'" : "'J'";
+
+        if($key == 'INT' || $key == 'INTEGER')
+            return 1;
         
         if($key != 'CDCLIENTE')
             return "'$value'";

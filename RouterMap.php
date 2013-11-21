@@ -1,9 +1,12 @@
 <?php
 /**
- * undocumented class
- *
- * @package default
- * @author 
+ * RouterMap can create a relational map by Enum Classes
+ * and migrate datas by associative tables.
+ * 
+ * @category Migration
+ * @package  MigrationDB
+ * @author   Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+ * @version  $Id$
  */
 class RouterMap
 {
@@ -12,66 +15,110 @@ class RouterMap
      *
      * @var object
      */
-    private $reflectionClass;
+    private $_reflectionClass;
     
-    private $filters;
-    private $ofDb;
-    private $toDb;
-    private $id;
+    /**
+     * @var object \FilterParams
+     */
+    private $_filters;
+    
+    /**
+     * @var object \PDO
+     */
+    private $_ofDb;
+    
+    /**
+     * @var object \PDO
+     */
+    private $_toDb;
+    
+    /**
+     * @var string|integer
+     */
+    private $_id;
 
+    /**
+     * Persist the class passed on instanciate this class to be reflected after  
+     *
+     * @param EnumTablesRelation $relationMapper
+     * @return object RelationMap
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     */
     public function __construct(EnumTablesRelation $relationMapper)
     {
-        $this->reflectionClass = $relationMapper;
+        $this->_reflectionClass = $relationMapper;
         return $this;
     }
 
+    /**
+     * Storage 2 conections internaly on class to be used in other methods and
+     * places if necessary. It should be a instance of PDO, this way is more
+     * simple to manage the API of differents databasse. So, a facade is not
+     * required to this work.  
+     *
+     * @param  \PDO $of
+     * @param  \PDO $to
+     *
+     * @return object RelationMap
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     */
     public function setConnection(PDO $of, PDO $to)
     {
-        $this->ofDb = $of;
-        $this->toDb = $to;
-
+        $this->_ofDb = $of;
+        $this->_toDb = $to;
         return $this;
     }
 
     /**
      * Register filter to be used in class on mount insert action
      *
-     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      * @param  \FilterParams $filter
-     * @return object RouterMap 
+     *
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @return object \RouterMap 
      */
     public function registerFilter(FilterParams $filter)
     {
-        $this->filters = $filter;
+        $this->_filters = $filter;
         return $this;
     }
 
-    public function MapperDatas($uniqueID)
+    /**
+     * mapperData call other methods to check if obrigatory data is setter and 
+     * raiser a error message if not. Get constants of class, trate this, and 
+     * execute query statement.
+     *
+     * @param  mixed $uniqueID
+     *
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @return null
+     */
+    public function mapperDatas($uniqueID)
     {
-        $this->id = $uniqueID;
+        $this->_id = $uniqueID;
         
         try{
             
-            if (! $this->isPropertiesOk()) {
+            if (! $this->_isPropertiesOk()) {
                 throw new Exception('Please! Look your properties for class '.__CLASS__);
             }
 
-            $fields = $this->getConstants();
+            $fields = $this->_getConstants();
 
             $fieldToDb = array_values($fields);
             $fieldOfDb = array_keys($fields);
 
-            $dataOf = $this->ofDb->query(
-                $this->mountSelect($fieldOfDb, $fields['OF_TABLE'])
+            $dataOf = $this->_ofDb->query(
+                $this->_mountSelect($fieldOfDb, $fields['OF_TABLE'])
             );
 
-            $insertDDLs = $this->mountInsert(
+            $insertDDLs = $this->_mountInsert(
                 $dataOf->fetchAll(PDO::FETCH_ASSOC),
                 $fieldToDb,
                 $fields['TO_TABLE']
             );
 
-            $this->toDb->exec($insertDDLs);
+            $this->_toDb->exec($insertDDLs);
 
         } catch (Exception $error) {
             echo '<br /><strong>Error:</strong> '. $error->getMessage();
@@ -83,26 +130,42 @@ class RouterMap
     /**
      * Check if relevant properties are serted
      * less it, the functionality of class is wront
+     *
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @return boolean
      */
-    private function isPropertiesOk()
+    private function _isPropertiesOk()
     {
-        if ($this->ofDb && $this->toDb && $this->reflectionClass) {
+        if ($this->_ofDb && $this->_toDb && $this->_reflectionClass) {
             return true;
         }
-
         return false;
     }
 
-    private function getConstants()
+    /**
+     * Get constants of class storaged on RouterMap::_reflectionClass by 
+     * reflection
+     *
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @return array
+     */
+    private function _getConstants()
     {
-        $reflection = new ReflectionClass(
-            get_class($this->reflectionClass)
-        );
-
+        $reflection = new ReflectionClass(get_class($this->_reflectionClass));
         return $reflection->getConstants();
     }
 
-    private function mountInsert(array $of, $to, $tableName)
+    /**
+     * Create the structions for all inserts
+     *
+     * @param array $of
+     * @param string $to
+     * @param string $tableName
+     *
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @return string
+     */
+    private function _mountInsert(array $of, $to, $tableName)
     {
         $query = 'INSERT INTO '.$tableName;
         
@@ -114,23 +177,31 @@ class RouterMap
 
             foreach ($combined as $key => $value) {
                 $field[] = $key;
-                $datas[] = $this->filters->keekFilterParams($key, $value, $this->id);
-            } 
+                $datas[] = $this->_filters->keekFilterParams($key, $value, $this->_id);
+            }
 
             $query .= '('.implode(', ', $field).')';
             $query .= ' VALUES('.implode(', ', $datas).')';
-
             $query = rtrim($query, ', ') . ';';
         }
         echo $query. '<br />';
         return  $query;
     }
 
-    protected function mountSelect(array $fields, $table, $complement = null)
+    /**
+     * Mount SELECT query statement
+     *
+     * @param array $fields
+     * @param mixed $table
+     * @param mixed $complement
+     *
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @return string
+     */
+    private function _mountSelect(array $fields, $table, $complement = null)
     {
         unset($fields['0']);
         unset($fields['1']);
-
         return $query = 'SELECT '. implode(', ', $fields) 
         . ' FROM '. $table ." $complement";
     }
