@@ -40,11 +40,18 @@ $mySqlConnection->setAttribute(
     PDO::ERRMODE_EXCEPTION
 );
 
+
+
+
+
+
+// Insert Client
 $router = new RouterMap(new Usuario);
 $router->setConnection($mySqlConnection, $fireBirdConnection)
+    ->registerFilter(new InsertUserConditions)
     ->MapperDatas($uniqueID);
 
 $router = new RouterMap(new Clients);
 $router->setConnection($mySqlConnection, $fireBirdConnection)
+    ->registerFilter(new InsertUserConditions)
 	->MapperDatas($uniqueID);
-

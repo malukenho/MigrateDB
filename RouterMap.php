@@ -5,119 +5,128 @@
  */
 class RouterMap
 {
-	/**
-	 *	Class to be reflected
-	 */
+    /**
+     *  Class to be reflected
+     */
     private $reflectionClass;
-	private $ofDb;
-	private $toDb;
-	private $id;
+    private $filters;
+    private $ofDb;
+    private $toDb;
+    private $id;
 
-	public function __construct(EnumTablesRelation $relationMapper)
-	{
-		$this->reflectionClass = $relationMapper;
-		return $this;
-	}
+    public function __construct(EnumTablesRelation $relationMapper)
+    {
+        $this->reflectionClass = $relationMapper;
+        return $this;
+    }
 
-	public function setConnection(PDO $of, PDO $to)
-	{
-		$this->ofDb = $of;
-		$this->toDb = $to;
+    public function setConnection(PDO $of, PDO $to)
+    {
+        $this->ofDb = $of;
+        $this->toDb = $to;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function MapperDatas($uniqueID)
-	{
-		$this->id = $uniqueID;
+    /**
+     * Register filter to be used in class on mount insert action
+     *
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @param  \FilterParams $filter
+     * @return object RouterMap 
+     */
+    public function registerFilter(FilterParams $filter)
+    {
+        $this->filters = $filter;
+        return $this;
+    }
 
-		try{
-			
-			if (! $this->isPropertiesOk()) {
-				throw new Exception('Please! Look your properties for class '.__CLASS__);
-			}
+    public function MapperDatas($uniqueID)
+    {
+        $this->id = $uniqueID;
 
-			$fields = $this->getConstants();
+        try{
+            
+            if (! $this->isPropertiesOk()) {
+                throw new Exception('Please! Look your properties for class '.__CLASS__);
+            }
 
-			$fieldToDb = array_values($fields);
-			$fieldOfDb = array_keys($fields);
+            $fields = $this->getConstants();
+
+            $fieldToDb = array_values($fields);
+            $fieldOfDb = array_keys($fields);
 
             $dataOf = $this->ofDb->query(
                 $this->mountSelect($fieldOfDb, $fields['OF_TABLE'])
             );
 
             $insertDDLs = $this->mountInsert(
-            	$dataOf->fetchAll(PDO::FETCH_ASSOC),
-            	$fieldToDb,
-            	$fields['TO_TABLE']
+                $dataOf->fetchAll(PDO::FETCH_ASSOC),
+                $fieldToDb,
+                $fields['TO_TABLE']
             );
 
             $this->toDb->exec($insertDDLs);
 
-		} catch (Exception $error) {
-			echo '<strong>Error:</strong> '. $error->getMessage();
-			exit;
-		}
-	}
+        } catch (Exception $error) {
+            echo '<br /><strong>Error:</strong> '. $error->getMessage();
+            exit;
+        }
+    }
 
-	private function isPropertiesOk()
-	{
-		if ($this->ofDb 
-			&& $this->toDb
-			&& $this->reflectionClass
-		) {
-			return true;
-		}
 
-		return false;
+    /**
+     * Check if relevant properties are serted
+     * less it, the functionality of class is wront
+     */
+    private function isPropertiesOk()
+    {
+        if ($this->ofDb && $this->toDb && $this->reflectionClass) {
+            return true;
+        }
 
-	}
+        return false;
+    }
 
-	private function getConstants()
-	{
-		$reflection = new ReflectionClass(
-			get_class($this->reflectionClass)
-		);
+    private function getConstants()
+    {
+        $reflection = new ReflectionClass(
+            get_class($this->reflectionClass)
+        );
 
-		return $reflection->getConstants();
-	}
+        return $reflection->getConstants();
+    }
 
-	private function mountInsert(array $of, $to, $tableName)
-	{
-		$query = 'INSERT INTO '.$tableName;
-		
-		array_shift($to);
-		array_shift($to);
+    private function mountInsert(array $of, $to, $tableName)
+    {
+        $query = 'INSERT INTO '.$tableName;
+        
+        array_shift($to);
+        array_shift($to);
 
-		foreach ($of as $fields) {
-			$combined = array_combine($to, $fields);
+        foreach ($of as $fields) {
+            $combined = array_combine($to, $fields);
 
-			foreach ($combined as $key => $value) {
-				$field[] = $key;
+            foreach ($combined as $key => $value) {
+                $field[] = $key;
+                $datas[] = $this->filters->keekFilterParams($key, $value);
+            } 
 
-				if($key == 'CDUSUARIO' || $key == 'CDUSUARIOCAD')
-					$datas[] = "'TESTES_ALFAMA2'";
-				elseif($key != 'CDCLIENTE')
-					$datas[] = "'$value'";
-				else
-					$datas[] = "{$this->id}";
-			} 
+            $query .= '('.implode(', ', $field).')';
+            $query .= ' VALUES('.implode(', ', $datas).')';
 
-			$query .= '('.implode(', ', $field).')';
-			$query .= ' VALUES('.implode(', ', $datas).')';
+            $query = rtrim($query, ', ') . ';';
+        }
+        echo $query;
+        return  $query;
+    }
 
-			$query = rtrim($query, ', ') . ';';
-		}
-		echo $query;
-		return  $query;
-	}
+    protected function mountSelect(array $fields, $table, $complement = null)
+    {
+        unset($fields['0']);
+        unset($fields['1']);
 
-	protected function mountSelect(array $fields, $table, $complement = null)
-	{
-		unset($fields['0']);
-		unset($fields['1']);
-
-		return $query = 'SELECT '. implode(', ', $fields) 
-		. ' FROM '. $table ." $complement";
-	}
+        return $query = 'SELECT '. implode(', ', $fields) 
+        . ' FROM '. $table ." $complement";
+    }
 }
