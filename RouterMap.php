@@ -38,6 +38,14 @@ class RouterMap
     private $_id;
 
     /**
+     * Annotations of table is storage here
+     * @to_table @of_table and @complement
+     *
+     * @var array
+     */
+    private $_tables;
+
+    /**
      * Persist the class passed on instanciate this class to be reflected after  
      *
      * @param EnumTablesRelation $relationMapper
@@ -103,19 +111,27 @@ class RouterMap
                 throw new Exception('Please! Look your properties for class '.__CLASS__);
             }
 
+            if(! $this->_tables = $this->_getAnnotations()) {
+                throw new Exception(
+                    'Annotation @to_table and @of_table not found on class <strong>'
+                    . get_class($this->_reflectionClass) . '</strong>'
+                );
+            }
+
             $fields = $this->_getConstants();
 
             $fieldToDb = array_values($fields);
             $fieldOfDb = array_keys($fields);
+            
+            echo $this->_mountSelect($fieldOfDb);
 
             $dataOf = $this->_ofDb->query(
-                $this->_mountSelect($fieldOfDb, $fields['OF_TABLE'])
+                $this->_mountSelect($fieldOfDb)
             );
 
             $insertDDLs = $this->_mountInsert(
                 $dataOf->fetchAll(PDO::FETCH_ASSOC),
-                $fieldToDb,
-                $fields['TO_TABLE']
+                $fieldToDb
             );
 
             $this->_toDb->exec($insertDDLs);
@@ -156,22 +172,45 @@ class RouterMap
     }
 
     /**
+     * Get annotations @to_table and @of_table of class by reflection to determine
+     * what is the class to insert and comsumer data. yet get the @complement to be added
+     * to query Select
+     *
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @return array|boolean
+     */
+    private function _getAnnotations()
+    {
+        $reflection = new ReflectionClass(get_class($this->_reflectionClass));
+        $docBlock = $reflection->getDocComment();
+
+        preg_match('#\@of_table (.+)#', $docBlock, $of_table);
+        preg_match('#\@to_table (.+)#', $docBlock, $to_table);
+        preg_match('#\@complement (.+)#', $docBlock, $complement);
+
+        $tables['of_table'] = trim($of_table[1]);
+        $tables['to_table'] = trim($to_table[1]);
+        $tables['complement'] = trim($complement[1]);
+
+        if ($tables['of_table'] && $tables['to_table'])
+            return $tables;
+
+        return false;
+    }
+
+    /**
      * Create the structions for all inserts
      *
      * @param array $of
      * @param string $to
-     * @param string $tableName
      *
      * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      * @return string
      */
-    private function _mountInsert(array $of, $to, $tableName)
+    private function _mountInsert(array $of, $to)
     {
-        $query = 'INSERT INTO '.$tableName;
+        $query = 'INSERT INTO '.$this->_tables['to_table'];
         
-        array_shift($to);
-        array_shift($to);
-
         foreach ($of as $fields) {
             $combined = array_combine($to, $fields);
 
@@ -192,17 +231,13 @@ class RouterMap
      * Mount SELECT query statement
      *
      * @param array $fields
-     * @param mixed $table
-     * @param mixed $complement
      *
      * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      * @return string
      */
-    private function _mountSelect(array $fields, $table, $complement = null)
+    private function _mountSelect(array $fields)
     {
-        unset($fields['0']);
-        unset($fields['1']);
         return $query = 'SELECT '. implode(', ', $fields) 
-        . ' FROM '. $table ." $complement";
+        . ' FROM '. $this->_tables['of_table'] ." {$this->_tables['complement']}";
     }
 }

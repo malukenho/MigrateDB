@@ -1,9 +1,10 @@
 <?php
+/**
+ * @of_table pessoas
+ * @to_table ECADCLIENTE
+ */
 class Clients implements EnumTablesRelation
 {
-    const OF_TABLE = 'pessoas';
-    const TO_TABLE = 'ECADCLIENTE';
-
     const idpessoa = 'CDCLIENTE';
     const nome = 'NMCLIENTE';
     const email = 'DEEMAIL';

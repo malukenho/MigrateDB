@@ -3,7 +3,7 @@
  * This class output a instace of class required by methods
  * You can get Service access and classes by this point
  *
- * @package oraculo
+ * @package MigrateDB
  * @author  Jefersson Nathan <jeferssonn@alfamaweb.com.br> 
  */
 final class Factory
@@ -17,6 +17,12 @@ final class Factory
 	 *  // Include the file 'Mysql.php' on path 'Migration'
 	 *	$Factory->getService('Migration.Mysql');
 	 * </code>
+	 *
+	 *
+	 * @param  string $serviceName
+	 *
+	 * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+	 * @return mixed
 	 */
 	public function getService($serviceName)
 	{
@@ -26,7 +32,7 @@ final class Factory
 		if (! file_exists($pathForFile)) {
 			return false;
 		}
-
-		return require_once $pathForFile;
+		require_once $pathForFile;
+		return $this;
 	}
 }
