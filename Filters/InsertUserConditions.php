@@ -18,13 +18,25 @@ class InsertUserConditions implements FilterParams
         if($key == 'CDUSUARIO' || $key == 'CDUSUARIOCAD')
             return "'ALFAMA_TEST10'";
 
-        if($key == 'FLTPCLIENTE')
+        if ('DTVALIDADERESERVA' == $key && empty($value))
+            return 'CURRENT_TIMESTAMP';
+
+        if ('DTRESERVA' == $key)
+            return "'".substr($value, 0, -9)."'";
+
+        if ('CDRESERVAUNIDADE' == $key)
+            return "2";
+
+        if ('return' == $key)
+            return $value;
+
+        if ('FLTPCLIENTE' == $key)
             return ('cpf' == $value) ? "'F'" : "'J'";
         
-        if($key == 'NULL')
+        if ('NULL' == $key)
             return  'NULL';
 
-        if($key != 'CDCLIENTE')
+        if ('CDCLIENTE' != $key)
             return "'$value'";
         else
             return "{$adtional}";

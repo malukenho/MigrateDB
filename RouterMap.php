@@ -45,6 +45,12 @@ class RouterMap
      */
     private $_tables;
 
+
+    /**
+     * @var EnumTablesRelations
+     */
+    private $_replyClass;
+
     /**
      * Persist the class passed on instanciate this class to be reflected after  
      *
@@ -56,6 +62,70 @@ class RouterMap
     {
         $this->_reflectionClass = $relationMapper;
         return $this;
+    }
+
+    /**
+     * Reply the content to the class table associated to the class
+     *
+     * @param EnumTablesRelation $reply
+     * @return object RelationMap
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     */
+    public function Replyto(EnumTablesRelation $reply)
+    {
+        $this->_replyClass = $reply;
+        return $this;
+    }
+
+    /**
+     * Associate content, mount and execute query to insert action
+     *
+     * @param  PDOStatement $datas
+     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     */
+    public function with(PDOStatement $datas)
+    {
+        if (! $this->_replyClass) {
+            throw new Exception('Please, set the ReplyTo() method!');
+            return false;
+        }
+
+        print_r($datas);
+
+        $fields = $datas->fetchAll(PDO::FETCH_ASSOC);
+        $rules = $this->_getConstants($this->_replyClass);
+ 
+        foreach ($fields as $collection) {
+            foreach ($collection as $column => $value) {
+                $hashtableLocation = array_search($column, $rules);
+
+                $result[$hashtableLocation] = $this->_filters->keekFilterParams(
+                    $hashtableLocation, 
+                    $value
+                );
+            }
+        }
+
+        array_shift($result);
+
+        $columns = array_keys($result);
+        $values = array_values($result);
+        
+        echo 'INSERT INTO '.$this->_tables['to_table'] . '('.
+                implode(', ', $columns) 
+            .')  VALUES('.
+                implode(', ', $values) 
+            .')';
+        
+        $this->_toDb->exec(
+            'INSERT INTO '.$this->_tables['to_table'] . '('.
+                implode(', ', $columns) 
+            .')  VALUES('.
+                implode(', ', $values) 
+            .')'
+        );
+
+        print_r($result);
     }
 
     /**
@@ -106,7 +176,7 @@ class RouterMap
         $this->_id = $uniqueID;
         
         try{
-            
+
             if (! $this->_isPropertiesOk()) {
                 throw new Exception('Please! Look your properties for class '.__CLASS__);
             }
@@ -122,12 +192,16 @@ class RouterMap
 
             $fieldToDb = array_values($fields);
             $fieldOfDb = array_keys($fields);
-            
-            echo $this->_mountSelect($fieldOfDb);
 
             $dataOf = $this->_ofDb->query(
-                $this->_mountSelect($fieldOfDb)
+                $this->_mountSelect($fields, $this->_tables['type'])
             );
+
+            if ('select' == $this->_tables['type']
+                || 'join' == $this->_tables['type']
+            ) {
+                return $dataOf;
+            }
 
             $insertDDLs = $this->_mountInsert(
                 $dataOf->fetchAll(PDO::FETCH_ASSOC),
@@ -138,7 +212,6 @@ class RouterMap
 
         } catch (Exception $error) {
             echo '<br /><strong>Error:</strong> '. $error->getMessage();
-            exit;
         }
     }
 
@@ -165,16 +238,21 @@ class RouterMap
      * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      * @return array
      */
-    private function _getConstants()
+    private function _getConstants($class = null)
     {
-        $reflection = new ReflectionClass(get_class($this->_reflectionClass));
+        if (null !== $class)
+            $reflect = get_class($class);
+        else
+            $reflect = get_class($this->_reflectionClass);
+        
+        $reflection = new ReflectionClass($reflect);
         return $reflection->getConstants();
     }
 
     /**
      * Get annotations @to_table and @of_table of class by reflection to determine
      * what is the class to insert and comsumer data. yet get the @complement to be added
-     * to query Select
+     * to query Select and the @type set the typo of action
      *
      * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      * @return array|boolean
@@ -187,10 +265,12 @@ class RouterMap
         preg_match('#\@of_table (.+)#', $docBlock, $of_table);
         preg_match('#\@to_table (.+)#', $docBlock, $to_table);
         preg_match('#\@complement (.+)#', $docBlock, $complement);
+        preg_match('#\@type (.+)#', $docBlock, $type);
 
         $tables['of_table'] = trim($of_table[1]);
         $tables['to_table'] = trim($to_table[1]);
         $tables['complement'] = trim($complement[1]);
+        $tables['type'] = trim($type[1]);
 
         if ($tables['of_table'] && $tables['to_table'])
             return $tables;
@@ -228,16 +308,62 @@ class RouterMap
     }
 
     /**
-     * Mount SELECT query statement
+     * Mount SELECT query statement by type passed
      *
-     * @param array $fields
+     * @param array  $fields
+     * @param string $type
      *
      * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      * @return string
      */
-    private function _mountSelect(array $fields)
+    private function _mountSelect(array $fields, $type = 'as')
     {
-        return $query = 'SELECT '. implode(', ', $fields) 
+        switch ($type) {
+
+            case 'join':
+                foreach ($fields as $as => $columnAndTable) {
+                    $temp = explode('.', $columnAndTable);
+                  
+                    if (2 != count($temp)) {
+                        $temp[] = $this->_tables['of_table'];
+                    }
+                  
+                    $joinRelation[$temp[1]][$as] = $temp[0]; 
+                }
+
+                foreach ($joinRelation as $key => $value) {
+                    if ($key != $this->_tables['of_table']) {
+                        $join[] = ' INNER JOIN `'.$key.'` ';
+                    }
+                }
+
+                $this->_tables['complement'] = implode(' ', $join) . $this->_tables['complement'];
+
+                unset($temp);
+                unset($fields);
+                
+                foreach ($joinRelation as $table => $columns) {
+                    foreach ($columns as $alias => $nameColumn) {
+                        $temp[] = "`$table`.`$nameColumn` AS $alias";
+                    }
+                }
+                
+                $fields = $temp;
+
+                echo '<pre>'.print_r($fields, 1);
+                break;
+
+            case 'as':
+                foreach ($fields as $field => $alias) {
+                    $result[] = "`$field` AS `$alias`";
+                }
+                $fields = $result;
+                break;    
+        }
+
+        return  'SELECT '. implode(', ', $fields) 
         . ' FROM '. $this->_tables['of_table'] ." {$this->_tables['complement']}";
+
     }
+
 }
