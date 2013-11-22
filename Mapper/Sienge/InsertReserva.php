@@ -12,4 +12,5 @@ class InsertReserva implements EnumTablesRelation
 	const DEOBSERVACAO = 'aprovacao_comentario';
 	const CDRESERVAUNIDADE = 'idimobiliaria';
 	const CDCREDOR = 'id_sienge_corretor';
+	const FLORIGEM = 'condicao_aprovada';
 }

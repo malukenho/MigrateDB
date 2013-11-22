@@ -24,8 +24,11 @@ class InsertUserConditions implements FilterParams
         if ('DTRESERVA' == $key)
             return "'".substr($value, 0, -9)."'";
 
+        if ('FLORIGEM' == $key)
+            return "'V'";
+
         if ('CDRESERVAUNIDADE' == $key)
-            return "2";
+            return "{$adtional}";
 
         if ('return' == $key)
             return $value;

@@ -90,8 +90,6 @@ class RouterMap
             return false;
         }
 
-        print_r($datas);
-
         $fields = $datas->fetchAll(PDO::FETCH_ASSOC);
         $rules = $this->_getConstants($this->_replyClass);
  
@@ -101,7 +99,8 @@ class RouterMap
 
                 $result[$hashtableLocation] = $this->_filters->keekFilterParams(
                     $hashtableLocation, 
-                    $value
+                    $value,
+                    $this->_id
                 );
             }
         }
@@ -110,13 +109,7 @@ class RouterMap
 
         $columns = array_keys($result);
         $values = array_values($result);
-        
-        echo 'INSERT INTO '.$this->_tables['to_table'] . '('.
-                implode(', ', $columns) 
-            .')  VALUES('.
-                implode(', ', $values) 
-            .')';
-        
+
         $this->_toDb->exec(
             'INSERT INTO '.$this->_tables['to_table'] . '('.
                 implode(', ', $columns) 
@@ -125,7 +118,6 @@ class RouterMap
             .')'
         );
 
-        print_r($result);
     }
 
     /**
@@ -350,7 +342,6 @@ class RouterMap
                 
                 $fields = $temp;
 
-                echo '<pre>'.print_r($fields, 1);
                 break;
 
             case 'as':

@@ -16,6 +16,7 @@ class Reservas implements EnumTablesRelation
 	const idusuario_imobiliaria = 'idusuario_imobiliaria';
 	const vencimento = 'vencimento';
 	const data_cad = 'data_cad';
+	const condicao_aprovada = 'condicao_aprovada';
 	const aprovacao_comentario = 'aprovacao_comentario';
 
 	const id_sienge_corretor = 'id_sienge.corretores';
