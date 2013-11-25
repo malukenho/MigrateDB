@@ -15,8 +15,9 @@ class InsertUserConditions implements FilterParams
      */
     public function keekFilterParams($key, $value, $adtional = null)
     {
-        if($key == 'CDUSUARIO' || $key == 'CDUSUARIOCAD')
-            return "'ALFAMA_TEST10'";
+        if($key == 'CDUSUARIO' 
+            || $key == 'CDUSUARIOCAD')
+                return "'ALFAMA_TEST10'";
 
         if ('DTVALIDADERESERVA' == $key && empty($value))
             return 'CURRENT_TIMESTAMP';

@@ -2,7 +2,7 @@
 /**
  * @of_table reservas
  * @to_table EPVDRESERVAUNIDADE
- * @complement WHERE `reservas`.`id_sienge` IS NULL AND `reservas`.`idcorretor` = `corretores`.`idcorretor` ORDER BY idreserva DESC LIMIT 1
+ * @complement WHERE `reservas`.`id_sienge` IS NULL AND `reservas`.`idcorretor` = `corretores`.`idcorretor` ORDER BY idreserva DESC LIMIT 2
  * @type join
  */
 class Reservas implements EnumTablesRelation
