@@ -22,8 +22,11 @@ class InsertUserConditions implements FilterParams
         if ('DTVALIDADERESERVA' == $key && empty($value))
             return 'CURRENT_TIMESTAMP';
 
-        if ('DTRESERVA' == $key)
+        if ('DTCONTRATO' == $key)
             return "'".substr($value, 0, -9)."'";
+
+        if('NUCONTRATO' == $key)
+            return "'".(int) time()."'";
 
         if ('FLORIGEM' == $key)
             return "'V'";

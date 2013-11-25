@@ -81,6 +81,7 @@ class RouterMap
     public function Replyto(EnumTablesRelation $reply)
     {
         $this->_replyClass = $reply;
+        $this->_tables = $this->_getAnnotations($this->_replyClass);
         return $this;
     }
 
@@ -121,7 +122,7 @@ class RouterMap
             $columns = array_keys($result);
             $values = array_values($result);
 
-            $insert = 'INSERT INTO '.$this->_tables['to_table'] . '('.
+            echo $insert = 'INSERT INTO '.$this->_tables['to_table'] . '('.
                 implode(', ', $columns) 
             .')  VALUES('.
                 implode(', ', $values) 
@@ -268,9 +269,11 @@ class RouterMap
      * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      * @return array|boolean
      */
-    private function _getAnnotations()
+    private function _getAnnotations($class = null)
     {
-        $reflection = new ReflectionClass(get_class($this->_reflectionClass));
+        $class = isset($class) ? $class : $this->_reflectionClass;
+
+        $reflection = new ReflectionClass(get_class($class)); 
         $docBlock = $reflection->getDocComment();
 
         preg_match('#\@of_table (.+)#', $docBlock, $of_table);

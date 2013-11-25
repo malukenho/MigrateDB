@@ -1,7 +1,7 @@
 <?php
 /**
  * @of_table reservas
- * @to_table EPVDRESERVAUNIDADE
+ * @to_table EVNDCONTRATO
  * @complement WHERE `reservas`.`codigointerno` IS NULL ORDER BY idreserva DESC LIMIT 20
  * @type join
  */
@@ -16,8 +16,22 @@ class Reservas implements EnumTablesRelation
 	const idusuario_imobiliaria = 'idusuario_imobiliaria';
 	const vencimento = 'vencimento';
 	const data_cad = 'data_cad';
+	const valor_contrato = 'valor_contrato';
+	const valor_venda = 'valor_contrato';
 	const condicao_aprovada = 'condicao_aprovada';
 	const aprovacao_comentario = 'aprovacao_comentario';
+
+	const valor_repasse = 'valor_repasse';
+	const mes_incc = 'mes_incc';
+	const num_contrato_view = 'idreserva';
+	const idsituacao = 'idsituacao';
+	const residuo = 'ativo';
+	const ativo = 'ativo';
+	const seguro = 'ativo';
+	const tiposeguro = 'ativo';
+	const correcao = 'ativo';
+
+	const idcondicao = 'idreservascondicoes.reservas_condicoes ON reservas_condicoes.idreserva = reservas.idreserva';
 
 	const id_sienge_corretor = 'codigointerno.corretores ON corretores.idcorretor = reservas.idcorretor';
 	const id_sienge_pessoa = 'codigointerno.pessoas ON pessoas.idpessoa = reservas.idpessoa';
