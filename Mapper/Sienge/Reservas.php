@@ -2,7 +2,7 @@
 /**
  * @of_table reservas
  * @to_table EPVDRESERVAUNIDADE
- * @complement WHERE `reservas`.`id_sienge` IS NULL AND `reservas`.`idcorretor` = `corretores`.`idcorretor` ORDER BY idreserva DESC LIMIT 2
+ * @complement WHERE `reservas`.`codigointerno` IS NULL ORDER BY idreserva DESC LIMIT 20
  * @type join
  */
 class Reservas implements EnumTablesRelation
@@ -19,8 +19,8 @@ class Reservas implements EnumTablesRelation
 	const condicao_aprovada = 'condicao_aprovada';
 	const aprovacao_comentario = 'aprovacao_comentario';
 
-	const id_sienge_corretor = 'id_sienge.corretores';
-	const id_sienge_pessoa = 'id_sienge.pessoas';
-	const id_sienge_empreendimento = 'id_sienge.empreendimentos';
-	const id_sienge_unidade = 'id_sienge.empreendimentos_unidades';
+	const id_sienge_corretor = 'codigointerno.corretores ON corretores.idcorretor = reservas.idcorretor';
+	const id_sienge_pessoa = 'codigointerno.pessoas ON pessoas.idpessoa = reservas.idpessoa';
+	const id_sienge_empreendimento = 'codigointerno.empreendimentos ON empreendimentos.codigointerno IS NOT NULL';
+	const id_sienge_unidade = 'codigointerno.empreendimentos_unidades ON empreendimentos_unidades.idunidade = reservas.idunidade';
 }

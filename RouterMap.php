@@ -333,29 +333,49 @@ class RouterMap
 
             case 'join':
                 foreach ($fields as $as => $columnAndTable) {
+
+                    preg_match('#.+\s+(ON\s+.+)#', $columnAndTable, $joinAvaliable);
+
+                    preg_match('#(.+?\s)#', $columnAndTable, $m);
+
+                    if ($m) {
+                        $columnAndTable = $m[0];
+                    }
+
                     $temp = explode('.', $columnAndTable);
                   
                     if (2 != count($temp)) {
                         $temp[] = $this->_tables['of_table'];
                     }
                   
-                    $joinRelation[$temp[1]][$as] = $temp[0]; 
+                    $joinRelation[$temp[1]][$as][0] = $temp[0];
+
+                    if ($joinAvaliable) {
+                        $joinRelation[$temp[1]][$as][1] = $joinAvaliable[1];
+                    } 
                 }
 
                 foreach ($joinRelation as $key => $value) {
                     if ($key != $this->_tables['of_table']) {
-                        $join[] = ' INNER JOIN `'.$key.'` ';
+                        $temp_values = array_values($value);
+                        $on = '';
+
+                        if (2 == count($temp_values[0])) {
+                            $on = ' ' . $temp_values[0][1];
+                        }
+
+                        $join[] = ' INNER JOIN `'.trim($key).'` '.$on;
                     }
                 }
 
-                $this->_tables['complement'] = implode(' ', $join) . $this->_tables['complement'];
+                $this->_tables['complement'] = implode(' ', $join) .' '. $this->_tables['complement'];
 
                 unset($temp);
                 unset($fields);
                 
                 foreach ($joinRelation as $table => $columns) {
                     foreach ($columns as $alias => $nameColumn) {
-                        $temp[] = "`$table`.`$nameColumn` AS $alias";
+                        $temp[] = '`'.trim($table).'`.`'.trim($nameColumn[0]).'` AS '.$alias;
                     }
                 }
                 
@@ -372,7 +392,7 @@ class RouterMap
         }
 
         return  'SELECT '. implode(', ', $fields) 
-        . ' FROM '. $this->_tables['of_table'] ." {$this->_tables['complement']}";
+        . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
 
     }
 
