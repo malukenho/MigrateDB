@@ -52,6 +52,13 @@ class RouterMap
     private $_replyClass;
 
     /**
+     * Storage the Ids of Row modified
+     *
+     * @var array
+     */
+    private $_rowsModified = array();
+
+    /**
      * Persist the class passed on instanciate this class to be reflected after  
      *
      * @param EnumTablesRelation $relationMapper
@@ -79,11 +86,13 @@ class RouterMap
 
     /**
      * Associate content, mount and execute query to insert action
+     * You can additionality set a function to be called like a callback
+     * passing the $this->_rowsModified array like parameter
      *
      * @param  PDOStatement $datas
      * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
      */
-    public function with(PDOStatement $datas)
+    public function with(PDOStatement $datas, $callback = null)
     {
         if (! $this->_replyClass) {
             throw new Exception('Please, set the ReplyTo() method!');
@@ -92,7 +101,7 @@ class RouterMap
 
         $fields = $datas->fetchAll(PDO::FETCH_ASSOC);
         $rules = $this->_getConstants($this->_replyClass);
- 
+
         foreach ($fields as $collection) {
             foreach ($collection as $column => $value) {
                 $hashtableLocation = array_search($column, $rules);
@@ -103,21 +112,31 @@ class RouterMap
                     $this->_id
                 );
             }
-        }
 
-        array_shift($result);
+            $this->_rowsModified[$collection['idreserva']] = $this->_id;
 
-        $columns = array_keys($result);
-        $values = array_values($result);
+            if(isset($result['0']))
+                unset($result['0']);
 
-        $this->_toDb->exec(
-            'INSERT INTO '.$this->_tables['to_table'] . '('.
+            $columns = array_keys($result);
+            $values = array_values($result);
+
+            $insert = 'INSERT INTO '.$this->_tables['to_table'] . '('.
                 implode(', ', $columns) 
             .')  VALUES('.
                 implode(', ', $values) 
-            .')'
-        );
+            .');';
 
+            $this->_toDb->exec($insert);
+            $this->_id++;
+        }
+
+
+        if (null !== $callback) {
+            if (function_exists($callback)) {
+                $callback($this->_rowsModified);
+            }
+        }
     }
 
     /**
@@ -175,7 +194,7 @@ class RouterMap
 
             if(! $this->_tables = $this->_getAnnotations()) {
                 throw new Exception(
-                    'Annotation @to_table and @of_table not found on class <strong>'
+                    'Annotation <b>@to_table</b> and <b>@of_table</b> not found on class <strong>'
                     . get_class($this->_reflectionClass) . '</strong>'
                 );
             }
@@ -295,7 +314,7 @@ class RouterMap
             $query .= ' VALUES('.implode(', ', $datas).')';
             $query = rtrim($query, ', ') . ';';
         }
-        echo $query. '<br />';
+
         return  $query;
     }
 
