@@ -102,6 +102,8 @@ class RouterMap
 
         $fields = $datas->fetchAll(PDO::FETCH_ASSOC);
         $rules = $this->_getConstants($this->_replyClass);
+        echo '<pre>';
+        print_r($fields);
 
         foreach ($fields as $collection) {
             foreach ($collection as $column => $value) {
@@ -114,6 +116,19 @@ class RouterMap
                 );
             }
 
+            // Magic filter :3
+            while($key = array_search('filter', $rules)) {
+                $result[$key] = $this->_filters->keekFilterParams(
+                    $key, 
+                    $rules[$key],
+                    $this->_id
+                );
+
+                unset($rules[$key]);
+            }
+
+            print_r(array_search('filter', $rules));
+
             $this->_rowsModified[$collection['idreserva']] = $this->_id;
 
             if(isset($result['0']))
@@ -122,13 +137,15 @@ class RouterMap
             $columns = array_keys($result);
             $values = array_values($result);
 
-            echo $insert = 'INSERT INTO '.$this->_tables['to_table'] . '('.
+            echo  
+            $insert = 'INSERT INTO '.$this->_tables['to_table'] . '('.
                 implode(', ', $columns) 
             .')  VALUES('.
                 implode(', ', $values) 
             .');';
-
             $this->_toDb->exec($insert);
+            
+            echo '<br><br>';
             $this->_id++;
         }
 
@@ -378,7 +395,17 @@ class RouterMap
                 
                 foreach ($joinRelation as $table => $columns) {
                     foreach ($columns as $alias => $nameColumn) {
-                        $temp[] = '`'.trim($table).'`.`'.trim($nameColumn[0]).'` AS '.$alias;
+
+                        $sqlPattern = (trim($nameColumn[0]) == '*') 
+                                        ? '`%s`.%s' 
+                                        : '`%s`.`%s` AS %s';
+
+                        $temp[] = sprintf(
+                            $sqlPattern,
+                            trim($table),
+                            trim($nameColumn[0]),
+                            $alias
+                        );
                     }
                 }
                 
@@ -393,6 +420,8 @@ class RouterMap
                 $fields = $result;
                 break;    
         }
+        echo 'SELECT '. implode(', ', $fields) 
+        . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
 
         return  'SELECT '. implode(', ', $fields) 
         . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
