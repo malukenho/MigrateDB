@@ -20,11 +20,4 @@ class InsertReserva implements EnumTablesRelation
 	const FLSEGURO = 'seguro';
 	const FLTIPOSEGURO = 'tiposeguro';
 	const FLCORRECAO = 'correcao';
-	// const NUUNIDADE = 'id_sienge_unidade';
-	// const DTRESERVA = 'data_cad';
-	// const DTVALIDADERESERVA = 'vencimento';
-	// const DEOBSERVACAO = 'aprovacao_comentario';
-	// const CDRESERVAUNIDADE = 'idimobiliaria';
-	// const CDCREDOR = 'id_sienge_corretor';
-	// const FLORIGEM = 'condicao_aprovada';
 }

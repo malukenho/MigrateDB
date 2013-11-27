@@ -102,8 +102,8 @@ class RouterMap
 
         $fields = $datas->fetchAll(PDO::FETCH_ASSOC);
         $rules = $this->_getConstants($this->_replyClass);
-        echo '<pre>';
-        print_r($fields);
+        // echo '<pre>';
+        // print_r($fields);
 
         foreach ($fields as $collection) {
             foreach ($collection as $column => $value) {
@@ -126,8 +126,6 @@ class RouterMap
 
                 unset($rules[$key]);
             }
-
-            print_r(array_search('filter', $rules));
 
             $this->_rowsModified[$collection['idreserva']] = $this->_id;
 
@@ -300,7 +298,7 @@ class RouterMap
 
         $tables['of_table'] = trim($of_table[1]);
         $tables['to_table'] = trim($to_table[1]);
-        $tables['complement'] = trim($complement[1]);
+        $tables['complement'] = str_replace('$1', $this->_id, trim($complement[1]));
         $tables['type'] = trim($type[1]);
 
         if ($tables['of_table'] && $tables['to_table'])
@@ -396,7 +394,7 @@ class RouterMap
                 foreach ($joinRelation as $table => $columns) {
                     foreach ($columns as $alias => $nameColumn) {
 
-                        $sqlPattern = (trim($nameColumn[0]) == '*') 
+                        $sqlPattern = ('*' == trim($nameColumn[0])) 
                                         ? '`%s`.%s' 
                                         : '`%s`.`%s` AS %s';
 
@@ -420,9 +418,10 @@ class RouterMap
                 $fields = $result;
                 break;    
         }
-        echo 'SELECT '. implode(', ', $fields) 
-        . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
 
+  echo  'SELECT '. implode(', ', $fields) 
+        . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
+        
         return  'SELECT '. implode(', ', $fields) 
         . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
 

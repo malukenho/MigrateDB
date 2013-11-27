@@ -22,6 +22,9 @@ class InsertUserConditions implements FilterParams
         if ('DTVALIDADERESERVA' == $key && empty($value))
             return 'CURRENT_TIMESTAMP';
 
+        if ('CDRESERVAUNIDADE' == $key || 'NUCONTRATO' == $key)
+            return "{$adtional}";
+
         if ('DTCONTRATO' == $key)
             return "'".substr($value, 0, -9)."'";
 
@@ -30,9 +33,6 @@ class InsertUserConditions implements FilterParams
 
         if ('FLORIGEM' == $key)
             return "'V'";
-
-        if ('CDRESERVAUNIDADE' == $key)
-            return "{$adtional}";
 
         if ('return' == $key)
             return $value;
