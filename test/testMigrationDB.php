@@ -2,21 +2,21 @@
 error_reporting(-1);
 ini_set('display_errors', 1);
 
-require __DIR__.'/../RouterMap.php';
+require __DIR__.'/../MigrationDB.php';
 require __DIR__.'/../Interface/EnumTablesRelation.php';
 require __DIR__.'/../Interface/FilterParams.php';
 
 
-class testRouterMap extends PHPUnit_Framework_TestCase
+class testMigrationDB extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * @test
 	 */
 	public function if_class_can_be_instanciate()
 	{
-		$reflection = new ReflectionClass('RouterMap');
+		$reflection = new ReflectionClass('MigrationDB');
 		$instance = $reflection->newInstanceWithoutConstructor();
-		$this->assertInstanceOf('RouterMap', $instance);
+		$this->assertInstanceOf('MigrationDB', $instance);
 		return $instance;
 	}
 
@@ -34,7 +34,7 @@ class testRouterMap extends PHPUnit_Framework_TestCase
 		);
 
 		$this->assertInstanceOf(
-			'RouterMap',
+			'MigrationDB',
 			$router,
 			'No match class type'
 		);
@@ -58,15 +58,15 @@ class testRouterMap extends PHPUnit_Framework_TestCase
 	 */
 	public function filter_can_be_registred_and_storage_on_class()
 	{
-		$mockRouterMap = $this->getMockBuilder('RouterMap')
+		$mockMigrationDB = $this->getMockBuilder('MigrationDB')
 			->disableOriginalConstructor()
 			->getMock();
 		
-		$mockRouterMap->expects($this->any())
+		$mockMigrationDB->expects($this->any())
 			->method('registerFilter')
 			->will($this->throwException(new Exception));
 
-		$this->assertInstanceOf('RouterMap', $mockRouterMap);
+		$this->assertInstanceOf('MigrationDB', $mockMigrationDB);
 
 		$filter = $this->getMockBuilder('FilterParams')
 			->getMock();
@@ -76,7 +76,7 @@ class testRouterMap extends PHPUnit_Framework_TestCase
 		$router = $this->if_class_can_be_instanciate();
 
 		$this->assertInstanceOf(
-			'RouterMap', 
+			'MigrationDB', 
 			$router->registerFilter($filter)
 		);
 
@@ -87,24 +87,24 @@ class testRouterMap extends PHPUnit_Framework_TestCase
 	 */
 	public function replyTo_method_can_storage_data_and_get_information_by_annotations_returning_self_object()
 	{
-		$mockRouterMap = $this->getMockBuilder('RouterMap', array('ReplyTo'))
+		$mockMigrationDB = $this->getMockBuilder('MigrationDB', array('ReplyTo'))
 			->disableOriginalConstructor()
 			->getMock();
 
-		$this->assertInstanceOf('RouterMap', $mockRouterMap);
+		$this->assertInstanceOf('MigrationDB', $mockMigrationDB);
 
 		$EnumTablesRelation = $this->getMockBuilder('EnumTablesRelation')
 			->getMock();
 
 		$this->assertInstanceOf('EnumTablesRelation', $EnumTablesRelation);
 
-		$mockRouterMap->expects($this->any())
+		$mockMigrationDB->expects($this->any())
 			->method('ReplyTo')
 			->with($EnumTablesRelation);
 
-		$mockRouterMap->ReplyTo($EnumTablesRelation);
+		$mockMigrationDB->ReplyTo($EnumTablesRelation);
 		
-		$this->assertInstanceOf('RouterMap', $mockRouterMap);
+		$this->assertInstanceOf('MigrationDB', $mockMigrationDB);
 
 	}
 
