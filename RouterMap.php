@@ -102,8 +102,6 @@ class RouterMap
 
         $fields = $datas->fetchAll(PDO::FETCH_ASSOC);
         $rules = $this->_getConstants($this->_replyClass);
-        // echo '<pre>';
-        // print_r($fields);
 
         foreach ($fields as $collection) {
             foreach ($collection as $column => $value) {
@@ -135,7 +133,6 @@ class RouterMap
             $columns = array_keys($result);
             $values = array_values($result);
 
-            echo  
             $insert = 'INSERT INTO '.$this->_tables['to_table'] . '('.
                 implode(', ', $columns) 
             .')  VALUES('.
@@ -143,7 +140,6 @@ class RouterMap
             .');';
             $this->_toDb->exec($insert);
             
-            echo '<br><br>';
             $this->_id++;
         }
 
@@ -418,10 +414,7 @@ class RouterMap
                 $fields = $result;
                 break;    
         }
-
-  echo  'SELECT '. implode(', ', $fields) 
-        . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
-        
+       
         return  'SELECT '. implode(', ', $fields) 
         . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
 

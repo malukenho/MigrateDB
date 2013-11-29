@@ -15,6 +15,8 @@ class InsertUserConditions implements FilterParams
      */
     public function keekFilterParams($key, $value, $adtional = null)
     {
+        global $mySqlConnecition;
+
         if($key == 'CDUSUARIO' 
             || $key == 'CDUSUARIOCAD')
                 return "'ALFAMA_TEST10'";
@@ -28,8 +30,12 @@ class InsertUserConditions implements FilterParams
         if ('DTCONTRATO' == $key)
             return "'".substr($value, 0, -9)."'";
 
-        if('NUCONTRATO' == $key)
-            return "'".(int) time()."'";
+        if ('CDEMPREEND' == $key) {
+            return '701';
+        }
+
+        if ('CDEMPRESA' == $key)
+            return "'1'";
 
         if ('FLORIGEM' == $key)
             return "'V'";
@@ -43,9 +49,14 @@ class InsertUserConditions implements FilterParams
         if ('NULL' == $key)
             return  'NULL';
 
-        if ('CDCLIENTE' != $key)
-            return "'$value'";
-        else
-            return "{$adtional}";
+        if ('CDCLIENTE' != $key){
+            $stmt =$mySqlConnecition->query('SELECT codigointerno FROM pessoas WHERE idpessoa='.$value);
+            $rst = $stmt->fetch(PDO::FETCH_ASSOC);
+            print_r($rst);
+            echo '<br>---<br><br>';
+            return "'{$rst['codigointerno']}'";
+        }
+        
+        return "{$adtional}";
     }
 }

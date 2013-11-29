@@ -11,7 +11,7 @@ class InsertReserva implements EnumTablesRelation
 	const VLFIXOSEGURO = 'valor_repasse';
 	const CDEMPRESA = 'idpessoa';
 	const CDEMPREEND = 'id_sienge_empreendimento';
-	const DTCONTRATO = 'data_cad';
+	const DTCONTRATO = 'data_cad_reserva';
 	const NUMESREAJUSTE = 'mes_incc';
 	const NUCONTRATOVIEW = 'num_contrato_view';
 	const FLSITUACAO = 'idsituacao';

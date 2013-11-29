@@ -15,7 +15,7 @@ class Reservas implements EnumTablesRelation
 	const idusuario = 'idusuario';
 	const idusuario_imobiliaria = 'idusuario_imobiliaria';
 	const vencimento = 'vencimento';
-	const data_cad = 'data_cad';
+	const data_cad_reserva = 'data_cad';
 	const valor_contrato = 'valor_contrato';
 	const valor_venda = 'valor_contrato';
 	const valor_saldo_vendedor = 'valor_contrato';
@@ -35,9 +35,8 @@ class Reservas implements EnumTablesRelation
 	const idcondicao = 'idreservascondicoes.reservas_condicoes 
 						ON reservas_condicoes.idreserva = reservas.idreserva';
 
-	// const nome_cliente = 'nome.pessoas ON pessoas.idpessoa = reservas.idpessoa';
 	const id_sienge_corretor = 'codigointerno.corretores ON corretores.idcorretor = reservas.idcorretor';
-	const id_sienge_pessoa = '*.pessoas ON pessoas.idpessoa = reservas.idpessoa AND pessoas.codigointerno';
+	const id_sienge_pessoa = '*.pessoas ON pessoas.idpessoa = reservas.idpessoa';
 	const id_sienge_empreendimento = 'codigointerno.empreendimentos ON empreendimentos.codigointerno IS NOT NULL';
 	const id_sienge_unidade = 'codigointerno.empreendimentos_unidades ON empreendimentos_unidades.idunidade = reservas.idunidade';
 }
