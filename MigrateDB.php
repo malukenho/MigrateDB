@@ -1,14 +1,15 @@
 <?php
 /**
- * MigrationDB can create a relational map by Enum Classes
+ * MigrateDB can create a relational map by Enum Classes
  * and migrate datas by associative tables.
  * 
  * @category Migration
- * @package  MigrationDB
+ * @package  MigrateDB
  * @author   Jefersson Nathan <malukenho@phpse.net>
- * @version  $Id$
+ * @license  GPL/2.0+
+ * @version  1.0
  */
-class MigrationDB
+class MigrateDB
 {
     /**
      * Class to be reflected is storage here
@@ -62,7 +63,7 @@ class MigrationDB
      * Persist the class passed on instanciate this class to be reflected after  
      *
      * @param EnumTablesRelation $relationMapper
-     * @return object MigrationDB
+     * @return object MigrateDB
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
     public function __construct(EnumTablesRelation $relationMapper)
@@ -75,10 +76,10 @@ class MigrationDB
      * Reply the content to the class table associated to the class
      *
      * @param EnumTablesRelation $reply
-     * @return object MigrationDB
+     * @return object MigrateDB
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
-    public function Replyto(EnumTablesRelation $reply)
+    public function replyTo(EnumTablesRelation $reply)
     {
         $this->_replyClass = $reply;
         $this->_tables = $this->_getAnnotations($this->_replyClass);
@@ -91,6 +92,8 @@ class MigrationDB
      * passing the $this->_rowsModified array like parameter
      *
      * @param  PDOStatement $datas
+     * @param  Mixed        $callback
+     *
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
     public function with(PDOStatement $datas, $callback = null)
@@ -115,7 +118,7 @@ class MigrationDB
             }
 
             // Magic filter :3
-            while($key = array_search('filter', $rules)) {
+            while ($key = array_search('filter', $rules)) {
                 $result[$key] = $this->_filters->keekFilterParams(
                     $key, 
                     $rules[$key],
@@ -157,10 +160,10 @@ class MigrationDB
      * simple to manage the API of differents databasse. So, a facade is not
      * required to this work.  
      *
-     * @param  \PDO $of
-     * @param  \PDO $to
+     * @param PDO $of
+     * @param PDO $to
      *
-     * @return object MigrationDB
+     * @return object MigrateDB
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
     public function setConnection(PDO $of, PDO $to)
@@ -176,7 +179,7 @@ class MigrationDB
      * @param  \FilterParams $filter
      *
      * @author Jefersson Nathan <malukenho@phpse.net>
-     * @return object \MigrationDB 
+     * @return object \MigrateDB 
      */
     public function registerFilter(FilterParams $filter)
     {
@@ -204,7 +207,7 @@ class MigrationDB
                 throw new Exception('Please! Look your properties for class '.__CLASS__);
             }
 
-            if(! $this->_tables = $this->_getAnnotations()) {
+            if (! $this->_tables = $this->_getAnnotations()) {
                 throw new Exception(
                     'Annotation <b>@to_table</b> and <b>@of_table</b> not found on class <strong>'
                     . get_class($this->_reflectionClass) . '</strong>'
@@ -255,7 +258,7 @@ class MigrationDB
     }
 
     /**
-     * Get constants of class storaged on MigrationDB::_reflectionClass by 
+     * Get constants of class storaged on MigrateDB::_reflectionClass by 
      * reflection
      *
      * @author Jefersson Nathan <malukenho@phpse.net>
@@ -263,11 +266,12 @@ class MigrationDB
      */
     private function _getConstants($class = null)
     {
-        if (null !== $class)
+        if (null !== $class) {
             $reflect = get_class($class);
-        else
+        } else {
             $reflect = get_class($this->_reflectionClass);
-        
+        }
+ 
         $reflection = new ReflectionClass($reflect);
         return $reflection->getConstants();
     }
@@ -297,8 +301,9 @@ class MigrationDB
         $tables['complement'] = str_replace('$1', $this->_id, trim($complement[1]));
         $tables['type'] = trim($type[1]);
 
-        if ($tables['of_table'] && $tables['to_table'])
+        if ($tables['of_table'] && $tables['to_table']) {
             return $tables;
+        }
 
         return false;
     }
@@ -344,7 +349,6 @@ class MigrationDB
     private function _mountSelect(array $fields, $type = 'as')
     {
         switch ($type) {
-
             case 'join':
                 foreach ($fields as $as => $columnAndTable) {
 
@@ -416,7 +420,8 @@ class MigrationDB
         }
        
         return  'SELECT '. implode(', ', $fields) 
-        . ' FROM '. $this->_tables['of_table'] ."  {$this->_tables['complement']}";
+            . ' FROM '. $this->_tables['of_table'] 
+            ."  {$this->_tables['complement']}";
 
     }
 

@@ -4,3 +4,13 @@ test.php
 config.php
 Mapper/*
 Filters/*
+*.swp
+corretores.php
+empreendimentos.php
+pessoas.php
+tabelaprecos.php
+vendas.php
+reserva.php
+file.htm
+nbproject/
+Sync/

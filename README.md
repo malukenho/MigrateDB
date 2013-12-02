@@ -6,6 +6,31 @@
 **MigrateDB** is a simple tool to migrate data between databases.
 
 #### Step 1
+
+Well, we have the follow table
+```sql
+mysql> SELECT * FROM user;
++------+------------+---------+
+| id   | name       | passwd  |
++------+------------+---------+
+|    1 | Kika Pimpo | 123@456 |
+|    2 | RamStrYou  | 1!#@$%6 |
++------+------------+---------+
+1 row in set (0.00 sec)
+```
+
+And are wanted migrate this datas to another table.
+```sql
+mysql> SELECT * FROM member;
++-----------+-----------------+------------+
+| user_id   | user_name       | user_pass  |
++-----------+-----------------+------------+
+|           Nothing to see here            |
++-----------+-----------------+------------+
+1 row in set (0.00 sec)
+```
+Let's go!
+
 Create the class to get data of a table. You can use the annotation @of_table to set it, and @complement to increase you query
 
 ```php
@@ -53,7 +78,7 @@ $loader->getService('Mapper.User')
 $mySql = new PDO('...');
 $mySql2 = new PDO('...');
 
-$router = new RouterMap(new User);
+$router = new MigrateDB(new User);
  
 $result = $router->setConnection($mySql, $mySql2)
     ->MapperDatas('1');
@@ -65,7 +90,7 @@ You can set it like this too
 
 ```php
 <?php
-$routerClient = new RouterMap(new ClientData);
+$routerClient = new MigrateDB(new ClientData);
 
 $routerClient->registerFilter(new ClientFilter)
     ->replyTo(new ClientDataReply)
@@ -74,7 +99,7 @@ $routerClient->registerFilter(new ClientFilter)
             $mySqlConnection, 
             $fireBirdConnection
         )->MapperDatas(
-            $value['idpessoa']
+            rand(0, 9)
         )
     );
 ```
