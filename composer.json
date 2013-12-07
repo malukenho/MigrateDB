@@ -1,5 +1,5 @@
 {
-    "name": "malukenho/MigrateDB",
+    "name": "malukenho/migratedb",
     "description": "The simple tools to migrate data between relational DB write in PHP",
     "authors": [
         {
