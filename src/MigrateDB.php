@@ -1,4 +1,6 @@
 <?php
+namespace MigrateDB;
+
 /**
  * MigrateDB can create a relational map by Enum Classes
  * and migrate datas by associative tables.
