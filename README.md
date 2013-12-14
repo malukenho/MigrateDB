@@ -7,6 +7,21 @@
 
 #### Step 1
 
+Install the **MigrateDB** is very simple using composer :3
+
+Create the follow script *composer.json*
+
+```javascript
+{
+    "require": {
+        "malukenho/migratedb": "dev-master"
+    }
+}
+```
+Run **composer install** and all's okay!
+
+
+
 Well, we have the follow table
 ```sql
 mysql> SELECT * FROM user;
@@ -31,7 +46,7 @@ mysql> SELECT * FROM member;
 ```
 Let's go!
 
-Create the class to get data of a table. You can use the annotation @of_table to set it, and @complement to increase you query
+Create the class to get data of a table. You can use the annotation ***@of_table*** to set it, and ***@complement*** to increase you query.
 
 ```php
 <?php
@@ -39,6 +54,7 @@ Create the class to get data of a table. You can use the annotation @of_table to
  * @of_table   user 
  * @to_table   member
  * @complement WHERE status = '1'
+ * @type select
  */
 class User implements EnumTablesRelation
 {
@@ -47,8 +63,15 @@ class User implements EnumTablesRelation
 	const user_pass = 'passwd';
 }
 ```
+
+The above code generates the following query
+
+```sql
+SELECT id, name, passwd FROM user WHERE status = 1
+```
+
 #### Step 2
-Create the class to relation with previous class. It go insert the tada selected on *Step 1* on this database
+Create the class to relation with previous class. It go insert the data selected on *Step 1* on this database
 
 ```php
 <?php
