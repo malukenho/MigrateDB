@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/malukenho/MigrateDB.png?branch=master)](https://travis-ci.org/malukenho/MigrateDB)
+
 # MigrateDB
 
 
