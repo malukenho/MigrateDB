@@ -53,10 +53,12 @@ Create the class to get data of a table. You can use the annotation ***@of_table
 ```php
 <?php
 /**
- * @of_table   user 
- * @to_table   member
- * @complement WHERE status = '1'
- * @type select
+ * @Configurations(
+ *     from_table="user",
+ *     to_table="member",
+ *     complement="WHERE status = '1'",
+ *     type="select"
+ * )
  */
 class User implements EnumTablesRelation
 {
@@ -78,8 +80,10 @@ Create the class to relation with previous class. It go insert the data selected
 ```php
 <?php
 /**
- * @of_table   user 
- * @to_table   member
+ * @Configurations(
+ *     from_table="user",
+ *     to_table="member"
+ * )
  */
 class InsertUser implements EnumTablesRelation
 {
@@ -94,11 +98,7 @@ Create file of configuration and execute migration :3
 
 ```php
 <?php
-$loader = require 'Load.php';
- 
-$loader->getService('Mapper.User')
-    ->getService('Mapper.InsertUser');
-
+$loader = require __DIR__.'/vendor/autoload.php';
 
 $mySql = new PDO('...');
 $mySql2 = new PDO('...');
