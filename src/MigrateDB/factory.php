@@ -1,4 +1,6 @@
 <?php
+namespace MigrateDB;
+
 /**
  * This class output a instace of class required by methods
  * You can get Service access and classes by this point
@@ -21,7 +23,7 @@ final class Factory
 	 *
 	 * @param  string $serviceName
 	 *
-	 * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+	 * @author Jefersson Nathan <malukenho@phpse.net>
 	 * @return mixed
 	 */
 	public function getService($serviceName)

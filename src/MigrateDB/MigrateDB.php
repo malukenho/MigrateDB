@@ -1,6 +1,11 @@
 <?php
 namespace MigrateDB;
 
+use ReflectionClass;
+use Herrera\Annotations\Tokens;
+use Herrera\Annotations\Tokenizer;
+use Herrera\Annotations\Convert\ToArray;
+
 /**
  * MigrateDB can create a relational map by Enum Classes
  * and migrate datas by associative tables.
@@ -41,8 +46,13 @@ class MigrateDB
     private $_id;
 
     /**
+     * @var object Tokenizer
+     */
+    private $_tokenizer;
+
+    /**
      * Annotations of table is storage here
-     * @to_table @of_table and @complement
+     * @to_table @from_table and @complement
      *
      * @var array
      */
@@ -68,9 +78,10 @@ class MigrateDB
      * @return object MigrateDB
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
-    public function __construct(EnumTablesRelation $relationMapper)
+    public function __construct(Interfaces\EnumTablesRelation $relationMapper)
     {
         $this->_reflectionClass = $relationMapper;
+        $this->_tokenizer = new Tokenizer();
         return $this;
     }
 
@@ -98,7 +109,7 @@ class MigrateDB
      *
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
-    public function with(PDOStatement $datas, $callback = null)
+    public function with(\PDOStatement $datas, $callback = null)
     {
         if (! $this->_replyClass) {
             throw new Exception('Please, set the ReplyTo() method!');
@@ -168,7 +179,7 @@ class MigrateDB
      * @return object MigrateDB
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
-    public function setConnection(PDO $of, PDO $to)
+    public function setConnection(\PDO $of, \PDO $to)
     {
         $this->_ofDb = $of;
         $this->_toDb = $to;
@@ -206,12 +217,12 @@ class MigrateDB
         try{
 
             if (! $this->_isPropertiesOk()) {
-                throw new Exception('Please! Look your properties for class '.__CLASS__);
+                throw new \InvalidArgumentException('Please! Look your properties for class '.__CLASS__);
             }
 
             if (! $this->_tables = $this->_getAnnotations()) {
-                throw new Exception(
-                    'Annotation <b>@to_table</b> and <b>@of_table</b> not found on class <strong>'
+                throw new \InvalidArgumentException(
+                    'Annotation <b>@to_table</b> and <b>@from_table</b> not found on class <strong>'
                     . get_class($this->_reflectionClass) . '</strong>'
                 );
             }
@@ -279,7 +290,7 @@ class MigrateDB
     }
 
     /**
-     * Get annotations @to_table and @of_table of class by reflection to determine
+     * Get annotations @to_table and @from_table of class by reflection to determine
      * what is the class to insert and comsumer data. yet get the @complement to be added
      * to query Select and the @type set the typo of action
      *
@@ -293,17 +304,21 @@ class MigrateDB
         $reflection = new ReflectionClass(get_class($class)); 
         $docBlock = $reflection->getDocComment();
 
-        preg_match('#\@of_table (.+)#', $docBlock, $of_table);
-        preg_match('#\@to_table (.+)#', $docBlock, $to_table);
-        preg_match('#\@complement (.+)#', $docBlock, $complement);
-        preg_match('#\@type (.+)#', $docBlock, $type);
+        $toArray = new ToArray();
+        $annotationList = $this->_tokenizer->parse($docBlock);
+        $annotationList = $toArray->convert(new Tokens($annotationList));
+        echo '<pre>';
 
-        $tables['of_table'] = trim($of_table[1]);
-        $tables['to_table'] = trim($to_table[1]);
-        $tables['complement'] = str_replace('$1', $this->_id, trim($complement[1]));
-        $tables['type'] = trim($type[1]);
+        if (! isset($annotationList[0])) {
+            return false;
+        }
 
-        if ($tables['of_table'] && $tables['to_table']) {
+        $tables['from_table'] = $annotationList[0]->values['from_table'];
+        $tables['to_table'] = $annotationList[0]->values['to_table'];
+        $tables['complement'] = str_replace('$1', $this->_id, $annotationList[0]->values['complement']);
+        $tables['type'] = $annotationList[0]->values['type'];
+
+        if ($tables['from_table'] && $tables['to_table']) {
             return $tables;
         }
 
@@ -365,7 +380,7 @@ class MigrateDB
                     $temp = explode('.', $columnAndTable);
                   
                     if (2 != count($temp)) {
-                        $temp[] = $this->_tables['of_table'];
+                        $temp[] = $this->_tables['from_table'];
                     }
                   
                     $joinRelation[$temp[1]][$as][0] = $temp[0];
@@ -376,7 +391,7 @@ class MigrateDB
                 }
 
                 foreach ($joinRelation as $key => $value) {
-                    if ($key != $this->_tables['of_table']) {
+                    if ($key != $this->_tables['from_table']) {
                         $temp_values = array_values($value);
                         $on = '';
 
@@ -422,7 +437,7 @@ class MigrateDB
         }
        
         return  'SELECT '. implode(', ', $fields) 
-            . ' FROM '. $this->_tables['of_table'] 
+            . ' FROM '. $this->_tables['from_table'] 
             ."  {$this->_tables['complement']}";
 
     }

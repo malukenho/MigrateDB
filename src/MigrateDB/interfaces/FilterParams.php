@@ -1,4 +1,5 @@
 <?php
+namespace MigrateDB\Interfaces;
 /**
  * If you want to modify the behave of application, do it by Filters :)
  * The implementation of filter behave like a DECORATOR PATTERN, but it's not
@@ -13,7 +14,7 @@
  *  	return "0";
  * </code>
  * 
- * @author  Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+ * @author  Jefersson Nathan <malukenho@phpse.net>
  * @package MigrationDB
  * @since   1.0
  */
@@ -21,7 +22,7 @@ interface FilterParams
 {
     /**
      * @return mixed
-     * @author Jefersson Nathan <jeferssonn@alfamaweb.com.br>
+     * @author Jefersson Nathan <malukenho@phpse.net>
      */
     public function keekFilterParams($key, $value, $adtional = null);
 }
