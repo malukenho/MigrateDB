@@ -48,7 +48,7 @@ mysql> SELECT * FROM member;
 ```
 Let's go!
 
-Create the class to get data of a table. You can use the annotation ***@of_table*** to set it, and ***@complement*** to increase you query.
+Create the class to get data of a table. You can use the annotation ***@from_table*** to set it, and ***@complement*** to increase you query.
 
 ```php
 <?php
@@ -127,4 +127,84 @@ $routerClient->registerFilter(new ClientFilter)
             rand(0, 9)
         )
     );
+```
+
+
+## Advanced
+
+#### Types
+We use advanced structures for migrating information between the database, it is decided according to the annotation `type` is the type definada in class `EnumTablesRelation`. There are **3 types** valid until now. They are:
+
+- select
+- join
+- as
+
+The **select** type has see on previous examples.
+
+#### join
+
+Here is a `join` example:
+
+```php
+<?php
+/**
+ * @Configurations(
+ *     from_table="UserList",
+ *     to_table="NewUserList",
+ *     complement="WHERE UserList.iduser = $1",
+ *     type="join"
+ * )
+ */
+class UserRelation implements EnumTablesRelation
+{
+	const user_id = 'userid';
+	const user_name = 'name.user_detail ON id = 1';
+	const user_pass = 'passwd';
+}
+```
+
+The previous code generate the following query:
+
+```sql
+SELECT 
+    `UserList`.`userid` AS user_id, 
+    `UserList`.`passwd` AS user_pass, 
+    `user_detail`.`name` AS user_name 
+        FROM UserList 
+            INNER JOIN 
+                `user_detail` ON user_detail.id = 1 
+WHERE UserList.iduser = 1
+```
+
+#### as
+
+Here is a `as` example:
+
+```php
+<?php
+/**
+ * @Configurations(
+ *     from_table="UserList",
+ *     to_table="NewUserList",
+ *     complement="WHERE iduser = $1",
+ *     type="as"
+ * )
+ */
+class UserRelation implements EnumTablesRelation
+{
+	const user_id = 'userid';
+	const user_name = 'name';
+	const user_pass = 'passwd';
+}
+```
+
+The previous code generate the following query:
+
+```sql
+SELECT 
+    `user_id` AS `userid`, 
+    `user_name` AS `name`, 
+    `user_pass` AS `passwd` 
+         FROM UserList 
+WHERE iduser = 1
 ```
