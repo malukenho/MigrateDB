@@ -307,7 +307,7 @@ class MigrateDB
         $toArray = new ToArray();
         $annotationList = $this->_tokenizer->parse($docBlock);
         $annotationList = $toArray->convert(new Tokens($annotationList));
-        echo '<pre>';
+
 
         if (! isset($annotationList[0])) {
             return false;
