@@ -9,7 +9,7 @@
 
 #### Step 1
 
-Install the **MigrateDB** is very simple using composer :3
+Installing the **MigrateDB** is very simple using composer :3
 
 Create the follow script *composer.json*
 
@@ -36,7 +36,7 @@ mysql> SELECT * FROM user;
 1 row in set (0.00 sec)
 ```
 
-And are wanted migrate this datas to another table.
+And would like to migrate this datas to another table.
 ```sql
 mysql> SELECT * FROM member;
 +-----------+-----------------+------------+
@@ -48,7 +48,7 @@ mysql> SELECT * FROM member;
 ```
 Let's go!
 
-Create the class to get data of a table. You can use the annotation ***@from_table*** to set it, and ***@complement*** to increase you query.
+Create the class to get data of a table. You can use the annotation ***@from_table*** to set it, and ***@complement*** to increase your query.
 
 ```php
 <?php
@@ -75,7 +75,7 @@ SELECT id, name, passwd FROM user WHERE status = 1
 ```
 
 #### Step 2
-Create the class to relation with previous class. It go insert the data selected on *Step 1* on this database
+Create the class to relation with previous class. It's gonna insert the data selected on *Step 1* on this database
 
 ```php
 <?php
@@ -111,7 +111,7 @@ $result = $router->setConnection($mySql, $mySql2)
 $router->replyTo(new InsertUser)
     ->with($result);
 ```
-You can set it like this too
+You can also set it like this
 
 ```php
 <?php
