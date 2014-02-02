@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/malukenho/MigrateDB.png?branch=master)](https://travis-ci.org/malukenho/MigrateDB)
-
+[![Build Status](https://travis-ci.org/malukenho/MigrateDB.png?branch=master)](https://travis-ci.org/malukenho/MigrateDB) [![Latest Stable Version](https://poser.pugx.org/malukenho/migratedb/v/stable.png)](https://packagist.org/packages/malukenho/migratedb) [![Total Downloads](https://poser.pugx.org/malukenho/migratedb/downloads.png)](https://packagist.org/packages/malukenho/migratedb) [![Latest Unstable Version](https://poser.pugx.org/malukenho/migratedb/v/unstable.png)](https://packagist.org/packages/malukenho/migratedb) [![License](https://poser.pugx.org/malukenho/migratedb/license.png)](https://packagist.org/packages/malukenho/migratedb)
 # MigrateDB
 
 
