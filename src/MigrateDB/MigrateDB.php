@@ -72,10 +72,10 @@ class MigrateDB
     private $_rowsModified = array();
 
     /**
-     * Persist the class passed on instanciate this class to be reflected after  
+     * Persist the class passed on instanciate this class to be reflected after
      *
-     * @param EnumTablesRelation $relationMapper
-     * @return object MigrateDB
+     * @param  \MigrateDB\Interfaces\EnumTablesRelation $relationMapper
+     * @return \MigrateDB\MigrateDB MigrateDB
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
     public function __construct(Interfaces\EnumTablesRelation $relationMapper)
@@ -88,7 +88,7 @@ class MigrateDB
     /**
      * Reply the content to the class table associated to the class
      *
-     * @param EnumTablesRelation $reply
+     * @param \MigrateDB\EnumTablesRelation $reply
      * @return object MigrateDB
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
@@ -104,9 +104,11 @@ class MigrateDB
      * You can additionality set a function to be called like a callback
      * passing the $this->_rowsModified array like parameter
      *
-     * @param  PDOStatement $datas
-     * @param  Mixed        $callback
+     * @param \PDOStatement $datas
+     * @param  Mixed $callback
      *
+     * @throws Exception
+     * @return bool
      * @author Jefersson Nathan <malukenho@phpse.net>
      */
     public function with(\PDOStatement $datas, $callback = null)
@@ -168,13 +170,13 @@ class MigrateDB
     }
 
     /**
-     * Storage 2 conections internaly on class to be used in other methods and
+     * Storage 2 conection internaly on class to be used in other methods and
      * places if necessary. It should be a instance of PDO, this way is more
      * simple to manage the API of differents databasse. So, a facade is not
-     * required to this work.  
+     * required to this work.
      *
-     * @param PDO $of
-     * @param PDO $to
+     * @param \PDO $of
+     * @param \PDO $to
      *
      * @return object MigrateDB
      * @author Jefersson Nathan <malukenho@phpse.net>
@@ -189,10 +191,10 @@ class MigrateDB
     /**
      * Register filter to be used in class on mount insert action
      *
-     * @param  \FilterParams $filter
+     * @param \MigrateDB\FilterParams $filter
      *
      * @author Jefersson Nathan <malukenho@phpse.net>
-     * @return object \MigrateDB 
+     * @return object MigrateDB
      */
     public function registerFilter(FilterParams $filter)
     {
@@ -201,12 +203,13 @@ class MigrateDB
     }
 
     /**
-     * mapperData call other methods to check if obrigatory data is setter and 
-     * raiser a error message if not. Get constants of class, trate this, and 
+     * mapperData call other methods to check if obrigatory data is setter and
+     * raiser a error message if not. Get constants of class, trate this, and
      * execute query statement.
      *
      * @param  mixed $uniqueID
      *
+     * @throws \InvalidArgumentException
      * @author Jefersson Nathan <malukenho@phpse.net>
      * @return null
      */
@@ -271,10 +274,11 @@ class MigrateDB
     }
 
     /**
-     * Get constants of class storaged on MigrateDB::_reflectionClass by 
+     * Get constants of class stored on MigrateDB::_reflectionClass by
      * reflection
      *
      * @author Jefersson Nathan <malukenho@phpse.net>
+     * @param null $class
      * @return array
      */
     private function _getConstants($class = null)
@@ -439,7 +443,5 @@ class MigrateDB
         return  'SELECT '. implode(', ', $fields) 
             . ' FROM '. $this->_tables['from_table'] 
             ."  {$this->_tables['complement']}";
-
     }
-
 }
